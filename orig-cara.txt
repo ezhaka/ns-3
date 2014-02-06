@@ -1,0 +1,33 @@
+5	0	0	1560
+10	0	0	2600
+15	0	0	5062
+20	0	0	7293
+25	0	0	9737
+30	0	0	11926
+35	0	0	90124
+40	0	0	194422
+45	0	0	301630
+50	0	0	424452
+55	0	0	549940
+60	0	0	654398
+65	0	0	771658
+70	0	0	896902
+75	0	0	1017415
+80	0	0	1142839
+85	0	0	1259919
+90	0	0	1374349
+95	0	0	1487515
+100	0	0	1601344
+Flow ID: 26 Src Addr 10.1.1.1 Dst Addr 10.1.1.25
+Tx Packets = 9790
+Rx Packets = 1214
+Throughput: 86.3366 Kbps
+Flow ID: 27 Src Addr 10.1.1.11 Dst Addr 10.1.1.15
+Tx Packets = 7630
+Rx Packets = 205
+Throughput: 22.5243 Kbps
+Flow ID: 28 Src Addr 10.1.1.21 Dst Addr 10.1.1.5
+Tx Packets = 10047
+Rx Packets = 443
+Throughput: 33.7133 Kbps
+

@@ -1,0 +1,37 @@
+WHY???
+
+
+Flow ID: 26 Src Addr 10.1.1.1 Dst Addr 10.1.1.25
+Tx Packets = 20396
+Rx Packets = 17648
+Lost Packets = 1954
+Throughput: 884.49 Kbps
+Flow ID: 27 Src Addr 10.1.1.11 Dst Addr 10.1.1.15
+Tx Packets = 14271
+Rx Packets = 12628
+Lost Packets = 1093
+Throughput: 904.53 Kbps
+Flow ID: 28 Src Addr 10.1.1.21 Dst Addr 10.1.1.5
+Tx Packets = 13853
+Rx Packets = 10493
+Lost Packets = 2248
+Throughput: 757.09 Kbps
+
+
+
+Flow ID: 26 Src Addr 10.1.1.1 Dst Addr 10.1.1.25
+Tx Packets = 20396
+Rx Packets = 20395
+Lost Packets = 0
+Throughput: 1022.18 Kbps
+Flow ID: 27 Src Addr 10.1.1.11 Dst Addr 10.1.1.15
+Tx Packets = 14271
+Rx Packets = 14271
+Lost Packets = 0
+Throughput: 1022.19 Kbps
+Flow ID: 28 Src Addr 10.1.1.21 Dst Addr 10.1.1.5
+Tx Packets = 14167
+Rx Packets = 14167
+Lost Packets = 0
+Throughput: 1022.18 Kbps
+
