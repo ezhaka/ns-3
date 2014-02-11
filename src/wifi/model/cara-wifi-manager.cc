@@ -126,6 +126,7 @@ CaraWifiManager::DoReportDataFailed (WifiRemoteStation *st)
       station->m_failed = 0;
       station->m_timer = 0;
     }
+    
   isCcaBusy = false;
 }
 void

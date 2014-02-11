@@ -91,6 +91,7 @@ public:
     m_bytesTotal = 0;
     isFromAddressInitialized = false;
     flowsCount = 0;
+    useErrorModel = false;
   }
 
   Experiment(std::string name) : m_output(name)
@@ -98,9 +99,15 @@ public:
     m_bytesTotal = 0;
     isFromAddressInitialized = false;
     flowsCount = 0;
+    useErrorModel = false;
   }
 
   Gnuplot2dDataset Run(std::string wifiManager);
+
+  void SetUseErrorModel(bool val)
+  {
+    useErrorModel = true;
+  }
 
 private:
   uint32_t MacTxDropCount;
@@ -115,6 +122,8 @@ private:
   Address fromAddress;
   bool isFromAddressInitialized;
   int flowsCount;
+
+  bool useErrorModel;
 
   void
   MacTxDrop(Ptr<const Packet> p);
@@ -264,7 +273,7 @@ Experiment::SetupFlow(int from, int to, Time start, Time stop, NodeContainer c, 
 
   // Create UDP application at n0
   Ptr<MyApp> app1 = CreateObject<MyApp> ();
-  app1->Setup (ns3UdpSocket1, sinkAddress1, packetSize, numPackets, DataRate ("1Mbps"));
+  app1->Setup (ns3UdpSocket1, sinkAddress1, packetSize, numPackets, DataRate ("6Mbps"));
   c.Get(from)->AddApplication (app1);
   app1->SetStartTime (start);
   app1->SetStopTime (stop);
@@ -277,7 +286,7 @@ Experiment::SetupFlow(int from, int to, Time start, Time stop, NodeContainer c, 
 Gnuplot2dDataset 
 Experiment::Run(std::string wifiManager)
 {
-  std::string phyMode ("DsssRate1Mbps");
+  //std::string phyMode ("DsssRate1Mbps");
   double distance = 50;  // m
   uint32_t numNodes = 6;  // by default, 5x5
   double interval = 0.001; // seconds
@@ -286,7 +295,7 @@ Experiment::Run(std::string wifiManager)
   std::string rtslimit = "1500";
   CommandLine cmd;
 
-  cmd.AddValue ("phyMode", "Wifi Phy mode", phyMode);
+  //cmd.AddValue ("phyMode", "Wifi Phy mode", phyMode);
   cmd.AddValue ("distance", "distance (m)", distance);
   cmd.AddValue ("packetSize", "distance (m)", packetSize);
   // cmd.AddValue ("rtslimit", "RTS/CTS Threshold (bytes)", rtslimit);
@@ -297,7 +306,7 @@ Experiment::Run(std::string wifiManager)
   // turn off RTS/CTS for frames below 2200 bytes
   Config::SetDefault ("ns3::WifiRemoteStationManager::RtsCtsThreshold", StringValue (rtslimit));
   // Fix non-unicast data rate to be the same as that of unicast
-  Config::SetDefault ("ns3::WifiRemoteStationManager::NonUnicastMode", StringValue (phyMode));
+  //Config::SetDefault ("ns3::WifiRemoteStationManager::NonUnicastMode", StringValue (phyMode));
 
   NodeContainer c;
   c.Create (numNodes);
@@ -311,7 +320,13 @@ Experiment::Run(std::string wifiManager)
   // ns-3 supports RadioTap and Prism tracing extensions for 802.11b
   wifiPhy.SetPcapDataLinkType (YansWifiPhyHelper::DLT_IEEE802_11_RADIO); 
 
+  if (useErrorModel)
+  {
+    wifiPhy.SetErrorRateModel("ns3::NistErrorRateModel");
+  }
+
   YansWifiChannelHelper wifiChannel;
+  
   wifiChannel.SetPropagationDelay ("ns3::ConstantSpeedPropagationDelayModel");
   wifiChannel.AddPropagationLoss ("ns3::FriisPropagationLossModel");
   wifiPhy.SetChannel (wifiChannel.Create ());
@@ -414,42 +429,21 @@ Experiment::Run(std::string wifiManager)
   return m_output;
 }
 
-
-
-int main (int argc, char *argv[])
+int main (int argc, char *argv[])       
 {
-  Gnuplot gnuplot = Gnuplot ("cara-vs-cara-vs-cara-vs-cca-cca-cca.png");
-  /*
+  Gnuplot gnuplot = Gnuplot ("avatar-van.png");
 
   Experiment idealExperiment("Avatar ideal");
   Experiment caraExperiment("Avatar Cara");
   Experiment aarfExperiment("Avatar Aarf");
-  Experiment arfExperiment("Avatar Arf");
-  Experiment caraCcaExperiment("Avatar Cara-CCA");
+  Experiment vanExperiment("Avatar Van");
 
+  //gnuplot.AddDataset (caraCcaExperiment.Run("ns3::RraaWifiManager"));
   gnuplot.AddDataset (idealExperiment.Run("ns3::IdealWifiManager"));
   gnuplot.AddDataset (caraExperiment.Run("ns3::CaraWifiManager"));
-  gnuplot.AddDataset (caraCcaExperiment.Run("ns3::CaraCcaWifiManager"));
+  gnuplot.AddDataset (aarfExperiment.Run("ns3::AarfWifiManager"));
+  gnuplot.AddDataset (vanExperiment.Run("ns3::HybridWifiManager"));
 
-  */
-
-  Experiment caraExperiment1("Avatar Cara 1");
-  Experiment caraExperiment2("Avatar Cara 2");
-  Experiment caraExperiment3("Avatar Cara 3");
-  Experiment caraExperiment4("Avatar Cara Cca 1");
-  Experiment caraExperiment5("Avatar Cara Cca 2");
-  Experiment caraExperiment6("Avatar Cara Cca 3");
-
-  gnuplot.AddDataset (caraExperiment1.Run("ns3::CaraWifiManager"));
-  gnuplot.AddDataset (caraExperiment2.Run("ns3::CaraWifiManager"));
-  gnuplot.AddDataset (caraExperiment3.Run("ns3::CaraWifiManager"));
-  gnuplot.AddDataset (caraExperiment4.Run("ns3::CaraCcaWifiManager"));
-  gnuplot.AddDataset (caraExperiment5.Run("ns3::CaraCcaWifiManager"));
-  gnuplot.AddDataset (caraExperiment6.Run("ns3::CaraCcaWifiManager"));
-
-
-  //gnuplot.AddDataset (aarfExperiment.Run("ns3::AarfWifiManager"));
-  //gnuplot.AddDataset (arfExperiment.Run("ns3::ArfWifiManager"));
   gnuplot.GenerateOutput (std::cout);
 }
 

@@ -31,6 +31,7 @@
 #include "error-rate-model.h"
 #include "ht-capabilities.h"
 #include "ht-wifi-mac-helper.h"
+#include "hybrid-wifi-manager.h"
 #include "ideal-wifi-manager.h"
 #include "interference-helper.h"
 #include "mac-low.h"
