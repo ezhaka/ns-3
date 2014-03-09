@@ -355,13 +355,7 @@ Experiment::Run(std::string wifiManager)
   positionAlloc->Add (Vector (-50.0, -86.603, 0.0));
   positionAlloc->Add (Vector (50.0, -86.603, 0.0));
 
-  mobility.SetPositionAllocator ("ns3::GridPositionAllocator",
-                                 "MinX", DoubleValue (0.0),
-                                 "MinY", DoubleValue (0.0),
-                                 "DeltaX", DoubleValue (distance),
-                                 "DeltaY", DoubleValue (distance),
-                                 "GridWidth", UintegerValue (5),
-                                 "LayoutType", StringValue ("RowFirst"));
+  mobility.SetPositionAllocator (positionAlloc);
   mobility.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
   mobility.Install (c);
 
@@ -412,6 +406,8 @@ Experiment::Run(std::string wifiManager)
   Ptr<Ipv4FlowClassifier> classifier = DynamicCast<Ipv4FlowClassifier> (flowmon.GetClassifier ());
   std::map<FlowId, FlowMonitor::FlowStats> stats = monitor->GetFlowStats ();
 
+  NS_LOG_UNCOND("----------------------------------");
+
   for (std::map<FlowId, FlowMonitor::FlowStats>::const_iterator iter = stats.begin (); iter != stats.end (); ++iter)
     {
       Ipv4FlowClassifier::FiveTuple t = classifier->FindFlow (iter->first);
@@ -433,15 +429,17 @@ int main (int argc, char *argv[])
 {
   Gnuplot gnuplot = Gnuplot ("avatar-van.png");
 
-  Experiment idealExperiment("Avatar ideal");
-  Experiment caraExperiment("Avatar Cara");
-  Experiment aarfExperiment("Avatar Aarf");
-  Experiment vanExperiment("Avatar Van");
+  Experiment idealExperiment("Ideal");
+  Experiment caraExperiment("Cara");
+  Experiment aarfExperiment("Aarf");
+  Experiment arfExperiment("Arf");
+  Experiment vanExperiment("Hybrid");
 
   //gnuplot.AddDataset (caraCcaExperiment.Run("ns3::RraaWifiManager"));
-  gnuplot.AddDataset (idealExperiment.Run("ns3::IdealWifiManager"));
-  gnuplot.AddDataset (caraExperiment.Run("ns3::CaraWifiManager"));
-  gnuplot.AddDataset (aarfExperiment.Run("ns3::AarfWifiManager"));
+  //gnuplot.AddDataset (vanExperiment.Run("ns3::HybridWifiManager"));
+  //gnuplot.AddDataset (idealExperiment.Run("ns3::IdealWifiManager"));
+  //gnuplot.AddDataset (caraExperiment.Run("ns3::CaraWifiManager"));
+  //gnuplot.AddDataset (aarfExperiment.Run("ns3::AarfWifiManager"));
   gnuplot.AddDataset (vanExperiment.Run("ns3::HybridWifiManager"));
 
   gnuplot.GenerateOutput (std::cout);

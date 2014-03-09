@@ -24,6 +24,7 @@
 #include "ns3/double.h"
 #include "ns3/uinteger.h"
 #include "ns3/simulator.h"
+#include <iostream>
 
 #define Min(a,b) ((a < b) ? a : b)
 #define Max(a,b) ((a > b) ? a : b)
@@ -116,8 +117,8 @@ HybridWifiManager::HybridWifiManager ()
   : WifiRemoteStationManager ()
 {
   mode = 0;
-  doProbe = true;
-  m_packetsToSwtich = 500;
+  doProbe = false;
+  totalPackets = 0;
   NS_LOG_FUNCTION (this);
 }
 HybridWifiManager::~HybridWifiManager ()
@@ -148,26 +149,40 @@ HybridWifiManager::TryDoProbe()
 {
   if (!doProbe)
   {
+    if (totalPackets % 10000 == 0)
+    {
+      //std::cout << "Probe started..." << std::endl;
+      mode = 0;
+      probe_caraRate = 0;
+      probe_aarfRate = 0;
+      m_packetsToSwtich = 1000;
+      doProbe = true;
+    }
+
     return;
+  }
+
+  if (m_packetsToSwtich == 500)
+  {
+    mode = 1;
   }
 
   m_packetsToSwtich--;
 
-  if (mode == 0 && m_packetsToSwtich == 0)
+  if (m_packetsToSwtich == 0)
   {
-    m_packetsToSwtich = 500;
-    mode = 1;
-    doProbe = true;
-  }
-
-  if (mode == 1 && m_packetsToSwtich == 0)
-  {
-    doProbe = false;
+    //std::cout << "Probe ended, aarfRate = " << probe_aarfRate << ", caraRate = " << probe_caraRate << std::endl;
 
     if (probe_aarfRate < probe_caraRate)
     {
       mode = 0;
     }
+    else
+    {
+      mode = 1;
+    }
+
+    doProbe = false;
   }
 }
 
@@ -181,6 +196,7 @@ void
 HybridWifiManager::DoReportDataFailed (WifiRemoteStation *st)
 {
   TryDoProbe();
+  totalPackets++;
 
   NS_LOG_FUNCTION (this << st);
   HybridWifiRemoteStation *station = (HybridWifiRemoteStation *) st;
@@ -266,6 +282,7 @@ HybridWifiManager::DoReportDataOk (WifiRemoteStation *st,
                                  double ackSnr, WifiMode ackMode, double dataSnr)
 {
   TryDoProbe();
+  totalPackets++;
 
   if (doProbe && mode == 0)
   {

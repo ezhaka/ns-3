@@ -84,6 +84,8 @@ private:
   // 0 -- cara
   // 1 -- aarf
 
+  unsigned int totalPackets;
+
   void TryDoProbe();
 
   virtual void DoReportSifsAfterTx()
