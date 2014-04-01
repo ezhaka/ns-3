@@ -44,6 +44,7 @@ private:
   Vector GetPosition (Ptr<Node> node);
   void AdvancePosition (Ptr<Node> node);
   Ptr<Socket> SetupPacketReceive (Ptr<Node> node);
+  void ChangeSpeed(OnOffHelper onOffHelper);
 
   uint32_t m_bytesTotal;
   Gnuplot2dDataset m_output;
@@ -89,6 +90,18 @@ Experiment::AdvancePosition (Ptr<Node> node)
   //std::cout << "x="<<pos.x << std::endl;
   Simulator::Schedule (Seconds (1.0), &Experiment::AdvancePosition, this, node);
 }
+
+void 
+Experiment::ChangeSpeed (OnOffHelper onOffHelper) 
+{
+  Time now = Simulator::Now();
+
+  onOffHelper.SetConstantRate(-200000 * now.GetSeconds() + 60000000);
+
+  //std::cout << "Now is: " << now.GetSeconds() << std::endl;
+  Simulator::Schedule (Seconds (1.0), &Experiment::ChangeSpeed, this, onOffHelper);
+}
+
 
 void
 Experiment::ReceivePacket (Ptr<Socket> socket)
@@ -150,7 +163,8 @@ Experiment::Run (const WifiHelper &wifi, const YansWifiPhyHelper &wifiPhy,
   apps.Start (Seconds (0.5));
   apps.Stop (Seconds (250.0));
 
-  Simulator::Schedule (Seconds (1.5), &Experiment::AdvancePosition, this, c.Get (1));
+  //Simulator::Schedule (Seconds (1.5), &Experiment::AdvancePosition, this, c.Get (1));
+  Simulator::Schedule (Seconds (1.5), &Experiment::ChangeSpeed, this, onoff);
   Ptr<Socket> recvSink = SetupPacketReceive (c.Get (1));
 
   Simulator::Run ();
@@ -244,19 +258,21 @@ int main (int argc, char *argv[])
   gnuplot = Gnuplot ("rate-control.png");
   wifi.SetStandard (WIFI_PHY_STANDARD_holland);
 
+/*
 
   NS_LOG_DEBUG ("hybrid");
   experiment = Experiment ("hybrid");
   wifi.SetRemoteStationManager ("ns3::HybridWifiManager");
   dataset = experiment.Run (wifi, wifiPhy, wifiMac, wifiChannel);
   gnuplot.AddDataset (dataset);
+*/
 
   NS_LOG_DEBUG ("arf");
   experiment = Experiment ("arf");
   wifi.SetRemoteStationManager ("ns3::ArfWifiManager");
   dataset = experiment.Run (wifi, wifiPhy, wifiMac, wifiChannel);
   gnuplot.AddDataset (dataset);
-
+/*
   NS_LOG_DEBUG ("aarf");
   experiment = Experiment ("aarf");
   wifi.SetRemoteStationManager ("ns3::AarfWifiManager");
@@ -274,19 +290,19 @@ int main (int argc, char *argv[])
   wifi.SetRemoteStationManager ("ns3::CaraWifiManager");
   dataset = experiment.Run (wifi, wifiPhy, wifiMac, wifiChannel);
   gnuplot.AddDataset (dataset);
-/*
+
   NS_LOG_DEBUG ("rraa");
   experiment = Experiment ("rraa");
   wifi.SetRemoteStationManager ("ns3::RraaWifiManager");
   dataset = experiment.Run (wifi, wifiPhy, wifiMac, wifiChannel);
   gnuplot.AddDataset (dataset);
-*/
+
   NS_LOG_DEBUG ("ideal");
   experiment = Experiment ("ideal");
   wifi.SetRemoteStationManager ("ns3::IdealWifiManager");
   dataset = experiment.Run (wifi, wifiPhy, wifiMac, wifiChannel);
   gnuplot.AddDataset (dataset);
-
+*/
 
   gnuplot.GenerateOutput (std::cout);
 

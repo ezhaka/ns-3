@@ -203,7 +203,7 @@ private:
   void 
   Experiment::MeasureSpeed()
   {
-    double mbs = flowsCount == 0 ? 0 : ((m_bytesTotal * 8.0) / 1000000) / flowsCount;
+    double mbs = (m_bytesTotal * 8.0) / 1000000;
     //std::cout << Simulator::Now().GetSeconds() << " mbs = " << mbs << std::endl;
     m_bytesTotal = 0;
     m_output.Add (Simulator::Now().GetSeconds(), mbs);
@@ -255,6 +255,7 @@ Experiment::SetupFlow(int from, int to, Time start, Time stop, NodeContainer c, 
 
   // UDP connection from N0 to N24
   Address sinkAddress1 (InetSocketAddress (ifcont.GetAddress (to), sinkPort)); // interface of n24
+
   PacketSinkHelper packetSinkHelper1 ("ns3::UdpSocketFactory", InetSocketAddress (Ipv4Address::GetAny (), sinkPort));
   ApplicationContainer sinkApps1 = packetSinkHelper1.Install (c.Get (to)); //n2 as sink
   sinkApps1.Start (Seconds (0.));
@@ -273,7 +274,7 @@ Experiment::SetupFlow(int from, int to, Time start, Time stop, NodeContainer c, 
 
   // Create UDP application at n0
   Ptr<MyApp> app1 = CreateObject<MyApp> ();
-  app1->Setup (ns3UdpSocket1, sinkAddress1, packetSize, numPackets, DataRate ("6Mbps"));
+  app1->Setup (ns3UdpSocket1, sinkAddress1, packetSize, numPackets, DataRate ("1Mbps"));
   c.Get(from)->AddApplication (app1);
   app1->SetStartTime (start);
   app1->SetStopTime (stop);
@@ -376,11 +377,11 @@ Experiment::Run(std::string wifiManager)
 
   // Create Apps
 
-  SetupFlow(1, 0, Seconds(10), Seconds(100), c, ifcont, 550, numPackets, true);
-  SetupFlow(2, 0, Seconds(10), Seconds(90), c, ifcont, 600, numPackets, false);
-  SetupFlow(3, 0, Seconds(10), Seconds(70), c, ifcont, 650, numPackets, false);
-  SetupFlow(4, 0, Seconds(10), Seconds(50), c, ifcont, 700, numPackets, false);
-  SetupFlow(5, 0, Seconds(10), Seconds(30), c, ifcont, 500, numPackets, false);
+  SetupFlow(1, 0, Seconds(0), Seconds(100), c, ifcont, 550, numPackets, true);
+  SetupFlow(2, 0, Seconds(20), Seconds(100), c, ifcont, 600, numPackets, false);
+  SetupFlow(3, 0, Seconds(40), Seconds(100), c, ifcont, 650, numPackets, false);
+  SetupFlow(4, 0, Seconds(60), Seconds(100), c, ifcont, 700, numPackets, false);
+  SetupFlow(5, 0, Seconds(80), Seconds(100), c, ifcont, 500, numPackets, false);
 
 
   // Install FlowMonitor on all nodes
@@ -413,9 +414,9 @@ Experiment::Run(std::string wifiManager)
       Ipv4FlowClassifier::FiveTuple t = classifier->FindFlow (iter->first);
     
           NS_LOG_UNCOND("Flow ID: " << iter->first << " Src Addr " << t.sourceAddress << " Dst Addr " << t.destinationAddress);
-          NS_LOG_UNCOND("Tx Packets = " << iter->second.txPackets);
-          NS_LOG_UNCOND("Rx Packets = " << iter->second.rxPackets);
-          NS_LOG_UNCOND("Lost Packets = " << iter->second.lostPackets);
+          //NS_LOG_UNCOND("Tx Packets = " << iter->second.txPackets);
+          //NS_LOG_UNCOND("Rx Packets = " << iter->second.rxPackets);
+          //NS_LOG_UNCOND("Lost Packets = " << iter->second.lostPackets);
           NS_LOG_UNCOND("Throughput: " << iter->second.rxBytes * 8.0 / (iter->second.timeLastRxPacket.GetSeconds()-iter->second.timeFirstTxPacket.GetSeconds()) / 1024  << " Kbps");
     }
   monitor->SerializeToXmlFile("lab-5.flowmon", true, true);
@@ -432,15 +433,15 @@ int main (int argc, char *argv[])
   Experiment idealExperiment("Ideal");
   Experiment caraExperiment("Cara");
   Experiment aarfExperiment("Aarf");
-  Experiment arfExperiment("Arf");
+  //Experiment arfExperiment("Arf");
   Experiment vanExperiment("Hybrid");
 
   //gnuplot.AddDataset (caraCcaExperiment.Run("ns3::RraaWifiManager"));
   //gnuplot.AddDataset (vanExperiment.Run("ns3::HybridWifiManager"));
   //gnuplot.AddDataset (idealExperiment.Run("ns3::IdealWifiManager"));
   //gnuplot.AddDataset (caraExperiment.Run("ns3::CaraWifiManager"));
-  //gnuplot.AddDataset (aarfExperiment.Run("ns3::AarfWifiManager"));
-  gnuplot.AddDataset (vanExperiment.Run("ns3::HybridWifiManager"));
+  gnuplot.AddDataset (aarfExperiment.Run("ns3::AarfWifiManager"));
+  //gnuplot.AddDataset (vanExperiment.Run("ns3::HybridWifiManager"));
 
   gnuplot.GenerateOutput (std::cout);
 }
