@@ -163,8 +163,8 @@ Experiment::Run (const WifiHelper &wifi, const YansWifiPhyHelper &wifiPhy,
   apps.Start (Seconds (0.5));
   apps.Stop (Seconds (250.0));
 
-  //Simulator::Schedule (Seconds (1.5), &Experiment::AdvancePosition, this, c.Get (1));
-  Simulator::Schedule (Seconds (1.5), &Experiment::ChangeSpeed, this, onoff);
+  Simulator::Schedule (Seconds (1.5), &Experiment::AdvancePosition, this, c.Get (1));
+  //Simulator::Schedule (Seconds (1.5), &Experiment::ChangeSpeed, this, onoff);
   Ptr<Socket> recvSink = SetupPacketReceive (c.Get (1));
 
   Simulator::Run ();
