@@ -274,7 +274,7 @@ Experiment::SetupFlow(int from, int to, Time start, Time stop, NodeContainer c, 
 
   // Create UDP application at n0
   Ptr<MyApp> app1 = CreateObject<MyApp> ();
-  app1->Setup (ns3UdpSocket1, sinkAddress1, packetSize, numPackets, DataRate ("1Mbps"));
+  app1->Setup (ns3UdpSocket1, sinkAddress1, packetSize, numPackets, DataRate (60000000));
   c.Get(from)->AddApplication (app1);
   app1->SetStartTime (start);
   app1->SetStopTime (stop);
@@ -350,11 +350,11 @@ Experiment::Run(std::string wifiManager)
   MobilityHelper mobility;
   Ptr<ListPositionAllocator> positionAlloc = CreateObject<ListPositionAllocator> ();
   positionAlloc->Add (Vector (0.0, 0.0, 0.0));
-  positionAlloc->Add (Vector (100.0, 0.0, 0.0));
-  positionAlloc->Add (Vector (50.0, 86.603, 0.0));
-  positionAlloc->Add (Vector (-50.0, 86.603, 0.0));
-  positionAlloc->Add (Vector (-50.0, -86.603, 0.0));
-  positionAlloc->Add (Vector (50.0, -86.603, 0.0));
+  positionAlloc->Add (Vector (10.0, 0.0, 0.0));
+  positionAlloc->Add (Vector (5.0, 8.6603, 0.0));
+  positionAlloc->Add (Vector (-5.0, 8.6603, 0.0));
+  positionAlloc->Add (Vector (-5.0, -8.6603, 0.0));
+  positionAlloc->Add (Vector (5.0, -8.6603, 0.0));
 
   mobility.SetPositionAllocator (positionAlloc);
   mobility.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
