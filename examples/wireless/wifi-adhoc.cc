@@ -130,7 +130,7 @@ Experiment::Run (const WifiHelper &wifi, const YansWifiPhyHelper &wifiPhy,
   m_bytesTotal = 0;
 
   NodeContainer c;
-  c.Create (2);
+  c.Create (3);
 
   PacketSocketHelper packetSocket;
   packetSocket.Install (c);
