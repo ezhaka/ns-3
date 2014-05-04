@@ -237,29 +237,29 @@ int main (int argc, char *argv[])
 
   Gnuplot2dDataset dataset;
 
-  NS_LOG_DEBUG ("aarf");
-  Experiment experiment = Experiment ("aarf");
-  wifi.SetRemoteStationManager ("ns3::AarfWifiManager");
-  dataset = experiment.Run (wifi, wifiPhy, wifiMac, wifiChannel);
-  gnuplot.AddDataset (dataset);
+  // NS_LOG_DEBUG ("aarf");
+  // Experiment experiment = Experiment ("aarf");
+  // wifi.SetRemoteStationManager ("ns3::AarfWifiManager");
+  // dataset = experiment.Run (wifi, wifiPhy, wifiMac, wifiChannel);
+  // gnuplot.AddDataset (dataset);
 
-  NS_LOG_DEBUG ("cara");
-  experiment = Experiment ("cara");
-  wifi.SetRemoteStationManager ("ns3::CaraWifiManager");
-  dataset = experiment.Run (wifi, wifiPhy, wifiMac, wifiChannel);
-  gnuplot.AddDataset (dataset);
+  // NS_LOG_DEBUG ("cara");
+  // experiment = Experiment ("cara");
+  // wifi.SetRemoteStationManager ("ns3::CaraWifiManager");
+  // dataset = experiment.Run (wifi, wifiPhy, wifiMac, wifiChannel);
+  // gnuplot.AddDataset (dataset);
 
   NS_LOG_DEBUG ("hybrid");
-  experiment = Experiment ("hybrid");
+  Experiment experiment = Experiment ("hybrid");
   wifi.SetRemoteStationManager ("ns3::HybridWifiManager");
   dataset = experiment.Run (wifi, wifiPhy, wifiMac, wifiChannel);
   gnuplot.AddDataset (dataset);
 
-  NS_LOG_DEBUG ("ideal");
-  experiment = Experiment ("ideal");
-  wifi.SetRemoteStationManager ("ns3::IdealWifiManager");
-  dataset = experiment.Run (wifi, wifiPhy, wifiMac, wifiChannel);
-  gnuplot.AddDataset (dataset);
+  // NS_LOG_DEBUG ("ideal");
+  // experiment = Experiment ("ideal");
+  // wifi.SetRemoteStationManager ("ns3::IdealWifiManager");
+  // dataset = experiment.Run (wifi, wifiPhy, wifiMac, wifiChannel);
+  // gnuplot.AddDataset (dataset);
   
   gnuplot.GenerateOutput (std::cout);
 

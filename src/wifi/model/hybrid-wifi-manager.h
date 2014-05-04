@@ -21,6 +21,7 @@
 #define HYBRID_WIFI_MANAGER_H
 
 #include "wifi-remote-station-manager.h"
+#include <queue>
 
 namespace ns3 {
 
@@ -35,6 +36,8 @@ namespace ns3 {
  * Originally implemented by Federico Maguolo for a very early
  * prototype version of ns-3.
  */
+
+
 class HybridWifiManager : public WifiRemoteStationManager
 {
 public:
@@ -61,6 +64,9 @@ private:
                           Ptr<const Packet> packet, bool normally);
   virtual bool IsLowLatency (void) const;
 
+  void CalcSuccessRatio();
+  bool DoesSuccessRatioJump();
+
   uint32_t m_packetsToSwtich;
   uint32_t m_timerTimeout;
   uint32_t m_successThreshold;
@@ -85,6 +91,11 @@ private:
   // 1 -- aarf
 
   unsigned int totalPackets;
+
+  // change sensitivity
+  unsigned int successfulPacketsCount;
+  unsigned int failedPacketsCount;
+  std::queue<double> ratioHistory;
 
   void TryDoProbe();
 

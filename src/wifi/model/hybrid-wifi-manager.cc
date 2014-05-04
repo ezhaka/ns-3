@@ -145,12 +145,61 @@ HybridWifiManager::DoCreateStation (void) const
 }
 
 void 
+HybridWifiManager::CalcSuccessRatio()
+{
+  unsigned int threshold = 1000;
+
+  if (successfulPacketsCount < threshold && failedPacketsCount < threshold)
+  {
+    return;
+  }
+
+  if (ratioHistory.size() >= 5)
+  {
+    ratioHistory.pop();
+  }
+
+  double ratio = (double)successfulPacketsCount / (double)(successfulPacketsCount + failedPacketsCount);
+  successfulPacketsCount = 0;
+  failedPacketsCount = 0;
+  ratioHistory.push(ratio);
+
+  NS_LOG_UNCOND(Simulator::Now().GetSeconds());
+  NS_LOG_UNCOND(ratio);
+}
+
+bool 
+HybridWifiManager::DoesSuccessRatioJump()
+{
+  if (ratioHistory.size() < 5)
+  {
+    return false;
+  }
+
+  double successRatioThreshold = 0.3;
+
+  if (abs(ratioHistory.front() - ratioHistory.back()) > successRatioThreshold)
+  {
+    return true;
+  }
+
+  return false;
+}
+
+void 
 HybridWifiManager::TryDoProbe()
 {
+  CalcSuccessRatio();
+
   if (!doProbe)
   {
-    if (totalPackets % 10000 == 0)
+    // condition to do probe
+    if (
+      //totalPackets % 10000 == 0 || 
+      totalPackets == 0 ||
+      DoesSuccessRatioJump())
     {
+
       //std::cout << "Probe started..." << std::endl;
       mode = 0;
       probe_caraRate = 0;
@@ -195,6 +244,8 @@ HybridWifiManager::DoReportRtsFailed (WifiRemoteStation *st)
 void
 HybridWifiManager::DoReportDataFailed (WifiRemoteStation *st)
 {
+  failedPacketsCount++;
+
   TryDoProbe();
   totalPackets++;
 
@@ -281,6 +332,8 @@ void
 HybridWifiManager::DoReportDataOk (WifiRemoteStation *st,
                                  double ackSnr, WifiMode ackMode, double dataSnr)
 {
+  successfulPacketsCount++;
+
   TryDoProbe();
   totalPackets++;
 
