@@ -64,7 +64,7 @@ private:
                           Ptr<const Packet> packet, bool normally);
   virtual bool IsLowLatency (void) const;
 
-  void CalcSuccessRatio();
+  bool CalcSuccessRatio();
   bool DoesSuccessRatioJump();
 
   uint32_t m_packetsToSwtich;

@@ -148,29 +148,35 @@ HybridWifiManager::DoCreateStation (void) const
   return station;
 }
 
-void 
+bool 
 HybridWifiManager::CalcSuccessRatio()
 {
   unsigned int threshold = 1000;
 
   if (successfulPacketsCount < threshold && failedPacketsCount < threshold)
   {
-    return;
+    return false;
   }
 
-  // if (ratioHistory.size() >= 5)
-  // {
-  //   ratioHistory.pop();
-  // }
+  if (ratioHistory.size() >= 10)
+  {
+    ratioHistory.erase(ratioHistory.begin());
+  }
 
   double ratio = (double)successfulPacketsCount / (double)(successfulPacketsCount + failedPacketsCount);
   successfulPacketsCount = 0;
   failedPacketsCount = 0;
 
   ratioHistory.push_back(ratio);
+  return true;
 
   // NS_LOG_UNCOND(Simulator::Now().GetSeconds());
   // NS_LOG_UNCOND(ratio);
+}
+
+double dAbs(double val)
+{
+  return val > 0 ? val : ((-1.0) * val);
 }
 
 bool 
@@ -204,15 +210,16 @@ HybridWifiManager::DoesSuccessRatioJump()
   }
 
   std = sqrt(std / normlizedRatioHistory.size());
-  bool doesJump = abs(lastVal - mean) > 3.0 * std;
+  bool doesJump = dAbs(lastVal - mean) > 3.0 * std;
 
-  if (doesJump)
-  {
-    NS_LOG_UNCOND(Simulator::Now().GetSeconds());
-    NS_LOG_UNCOND(3.0 * std);
-    NS_LOG_UNCOND(abs(lastVal - mean));
-    NS_LOG_UNCOND("------------------------");
-  }
+  // if (doesJump)
+  // {
+    // NS_LOG_UNCOND(Simulator::Now().GetSeconds());
+    // NS_LOG_UNCOND(3.0 * std);
+    // NS_LOG_UNCOND(dAbs(lastVal - mean));
+    // NS_LOG_UNCOND(doesJump);
+    // NS_LOG_UNCOND("------------------------");
+  // }
 
   return doesJump;
 }
@@ -220,15 +227,21 @@ HybridWifiManager::DoesSuccessRatioJump()
 void 
 HybridWifiManager::TryDoProbe()
 {
-  //CalcSuccessRatio();
-
+  bool newItemInserted = CalcSuccessRatio();
 
   if (!doProbe)
   {
+    bool doesJump = false;
+
+    if (newItemInserted)
+    {
+      doesJump = DoesSuccessRatioJump();
+    }
+
     // condition to do probe
     if (
       totalPackets == 0 ||
-      (rateDecreased > 3 && totalPackets > 10000))
+      doesJump)
     {
       NS_LOG_UNCOND(Simulator::Now().GetSeconds());
       NS_LOG_UNCOND("Probe started");
@@ -301,7 +314,7 @@ HybridWifiManager::DoReportDataFailed (WifiRemoteStation *st)
           {
             station->m_rate--;
             rateDecreased++;
-  NS_LOG_UNCOND(rateDecreased);
+  // NS_LOG_UNCOND(rateDecreased);
           }
         station->m_failed = 0;
         station->m_timer = 0;
@@ -329,7 +342,7 @@ HybridWifiManager::DoReportDataFailed (WifiRemoteStation *st)
               {
                 station->m_rate--;
                 rateDecreased++;
-  NS_LOG_UNCOND(rateDecreased);
+  // NS_LOG_UNCOND(rateDecreased);
               }
           }
         station->m_timer = 0;
@@ -346,7 +359,7 @@ HybridWifiManager::DoReportDataFailed (WifiRemoteStation *st)
               {
                 station->m_rate--;
                 rateDecreased++;
-  NS_LOG_UNCOND(rateDecreased);
+  // NS_LOG_UNCOND(rateDecreased);
               }
           }
         if (station->m_retry >= 2)
