@@ -95,7 +95,8 @@ private:
   // change sensitivity
   unsigned int successfulPacketsCount;
   unsigned int failedPacketsCount;
-  std::queue<double> ratioHistory;
+  std::vector<double> ratioHistory;
+  int rateDecreased;
 
   void TryDoProbe();
 

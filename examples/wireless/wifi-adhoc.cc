@@ -88,6 +88,7 @@ Experiment::AdvancePosition (Ptr<Node> node)
     }
   SetPosition (node, pos);
   //std::cout << "x="<<pos.x << std::endl;
+  NS_LOG_UNCOND(Simulator::Now().GetSeconds());
   Simulator::Schedule (Seconds (1.0), &Experiment::AdvancePosition, this, node);
 }
 

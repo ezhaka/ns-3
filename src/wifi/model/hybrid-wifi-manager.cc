@@ -25,6 +25,9 @@
 #include "ns3/uinteger.h"
 #include "ns3/simulator.h"
 #include <iostream>
+// #include <numeric>
+#include <cmath>
+// #include <ctgmath>
 
 #define Min(a,b) ((a < b) ? a : b)
 #define Max(a,b) ((a > b) ? a : b)
@@ -119,6 +122,7 @@ HybridWifiManager::HybridWifiManager ()
   mode = 0;
   doProbe = false;
   totalPackets = 0;
+  rateDecreased = 0;
   NS_LOG_FUNCTION (this);
 }
 HybridWifiManager::~HybridWifiManager ()
@@ -154,18 +158,19 @@ HybridWifiManager::CalcSuccessRatio()
     return;
   }
 
-  if (ratioHistory.size() >= 5)
-  {
-    ratioHistory.pop();
-  }
+  // if (ratioHistory.size() >= 5)
+  // {
+  //   ratioHistory.pop();
+  // }
 
   double ratio = (double)successfulPacketsCount / (double)(successfulPacketsCount + failedPacketsCount);
   successfulPacketsCount = 0;
   failedPacketsCount = 0;
-  ratioHistory.push(ratio);
 
-  NS_LOG_UNCOND(Simulator::Now().GetSeconds());
-  NS_LOG_UNCOND(ratio);
+  ratioHistory.push_back(ratio);
+
+  // NS_LOG_UNCOND(Simulator::Now().GetSeconds());
+  // NS_LOG_UNCOND(ratio);
 }
 
 bool 
@@ -176,35 +181,63 @@ HybridWifiManager::DoesSuccessRatioJump()
     return false;
   }
 
-  double successRatioThreshold = 0.3;
+  std::vector<double> normlizedRatioHistory;
 
-  if (abs(ratioHistory.front() - ratioHistory.back()) > successRatioThreshold)
+  double mean = 0.0;
+  double lastVal = ratioHistory[ratioHistory.size() - 1];
+
+  for(unsigned int i = 0; i < ratioHistory.size() - 1; ++i)
   {
-    return true;
+    double currentVal = ratioHistory[i];
+    normlizedRatioHistory.push_back(currentVal);
+    mean += currentVal;
   }
 
-  return false;
+  mean = mean / normlizedRatioHistory.size();
+
+  double std = 0.0;
+
+  for(std::vector<double>::iterator iter = normlizedRatioHistory.begin(); iter != normlizedRatioHistory.end(); iter++)
+  {
+    double sub = *iter - mean;
+    std += sub * sub;
+  }
+
+  std = sqrt(std / normlizedRatioHistory.size());
+  bool doesJump = abs(lastVal - mean) > 3.0 * std;
+
+  if (doesJump)
+  {
+    NS_LOG_UNCOND(Simulator::Now().GetSeconds());
+    NS_LOG_UNCOND(3.0 * std);
+    NS_LOG_UNCOND(abs(lastVal - mean));
+    NS_LOG_UNCOND("------------------------");
+  }
+
+  return doesJump;
 }
 
 void 
 HybridWifiManager::TryDoProbe()
 {
-  CalcSuccessRatio();
+  //CalcSuccessRatio();
+
 
   if (!doProbe)
   {
     // condition to do probe
     if (
-      //totalPackets % 10000 == 0 || 
       totalPackets == 0 ||
-      DoesSuccessRatioJump())
+      (rateDecreased > 3 && totalPackets > 10000))
     {
-
+      NS_LOG_UNCOND(Simulator::Now().GetSeconds());
+      NS_LOG_UNCOND("Probe started");
       //std::cout << "Probe started..." << std::endl;
       mode = 0;
       probe_caraRate = 0;
       probe_aarfRate = 0;
       m_packetsToSwtich = 1000;
+      totalPackets = 0;
       doProbe = true;
     }
 
@@ -232,6 +265,9 @@ HybridWifiManager::TryDoProbe()
     }
 
     doProbe = false;
+    rateDecreased = 0;
+    // std::vector<double> empty;
+    // std::swap(ratioHistory, empty);
   }
 }
 
@@ -264,6 +300,8 @@ HybridWifiManager::DoReportDataFailed (WifiRemoteStation *st)
         if (station->m_rate != 0)
           {
             station->m_rate--;
+            rateDecreased++;
+  NS_LOG_UNCOND(rateDecreased);
           }
         station->m_failed = 0;
         station->m_timer = 0;
@@ -290,6 +328,8 @@ HybridWifiManager::DoReportDataFailed (WifiRemoteStation *st)
             if (station->m_rate != 0)
               {
                 station->m_rate--;
+                rateDecreased++;
+  NS_LOG_UNCOND(rateDecreased);
               }
           }
         station->m_timer = 0;
@@ -305,6 +345,8 @@ HybridWifiManager::DoReportDataFailed (WifiRemoteStation *st)
             if (station->m_rate != 0)
               {
                 station->m_rate--;
+                rateDecreased++;
+  NS_LOG_UNCOND(rateDecreased);
               }
           }
         if (station->m_retry >= 2)
