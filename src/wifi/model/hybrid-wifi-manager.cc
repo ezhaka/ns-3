@@ -123,6 +123,7 @@ HybridWifiManager::HybridWifiManager ()
   doProbe = false;
   totalPackets = 0;
   rateDecreased = 0;
+  onlyStarted = false;
   NS_LOG_FUNCTION (this);
 }
 HybridWifiManager::~HybridWifiManager ()
@@ -235,12 +236,11 @@ HybridWifiManager::TryDoProbe()
 
     if (newItemInserted)
     {
-      doesJump = DoesSuccessRatioJump();
+      doesJump = /*totalPackets > 10000 && */DoesSuccessRatioJump();
     }
 
     // condition to do probe
-    if (
-      totalPackets == 0 ||
+    if (onlyStarted ||
       doesJump)
     {
       NS_LOG_UNCOND(Simulator::Now().GetSeconds());
@@ -251,6 +251,7 @@ HybridWifiManager::TryDoProbe()
       probe_aarfRate = 0;
       m_packetsToSwtich = 1000;
       totalPackets = 0;
+      onlyStarted = false;
       doProbe = true;
     }
 
@@ -296,7 +297,7 @@ HybridWifiManager::DoReportDataFailed (WifiRemoteStation *st)
   failedPacketsCount++;
 
   TryDoProbe();
-  totalPackets++;
+  //totalPackets++;
 
   NS_LOG_FUNCTION (this << st);
   HybridWifiRemoteStation *station = (HybridWifiRemoteStation *) st;

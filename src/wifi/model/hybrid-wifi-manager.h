@@ -91,6 +91,7 @@ private:
   // 1 -- aarf
 
   unsigned int totalPackets;
+  bool onlyStarted;
 
   // change sensitivity
   unsigned int successfulPacketsCount;
