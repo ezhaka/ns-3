@@ -257,7 +257,7 @@ int main (int argc, char *argv[])
 */
 
   gnuplot = Gnuplot ("rate-control.png");
-  wifi.SetStandard (WIFI_PHY_STANDARD_holland);
+  wifi.SetStandard (WIFI_PHY_STANDARD_80211b);
 
   // NS_LOG_DEBUG ("arf");
   // experiment = Experiment ("arf");
@@ -265,11 +265,11 @@ int main (int argc, char *argv[])
   // dataset = experiment.Run (wifi, wifiPhy, wifiMac, wifiChannel);
   // gnuplot.AddDataset (dataset);
 
-  // NS_LOG_UNCOND ("aarf");
-  // experiment = Experiment ("aarf");
-  // wifi.SetRemoteStationManager ("ns3::AarfWifiManager");
-  // dataset = experiment.Run (wifi, wifiPhy, wifiMac, wifiChannel);
-  // gnuplot.AddDataset (dataset);
+  NS_LOG_UNCOND ("aarf");
+  experiment = Experiment ("aarf");
+  wifi.SetRemoteStationManager ("ns3::AarfWifiManager");
+  dataset = experiment.Run (wifi, wifiPhy, wifiMac, wifiChannel);
+  gnuplot.AddDataset (dataset);
 
   // NS_LOG_DEBUG ("aarf-cd");
   // experiment = Experiment ("aarf-cd");
@@ -277,11 +277,11 @@ int main (int argc, char *argv[])
   // dataset = experiment.Run (wifi, wifiPhy, wifiMac, wifiChannel);
   // gnuplot.AddDataset (dataset);
 
-  // NS_LOG_UNCOND ("cara");
-  // experiment = Experiment ("cara");
-  // wifi.SetRemoteStationManager ("ns3::CaraWifiManager");
-  // dataset = experiment.Run (wifi, wifiPhy, wifiMac, wifiChannel);
-  // gnuplot.AddDataset (dataset);
+  NS_LOG_UNCOND ("cara");
+  experiment = Experiment ("cara");
+  wifi.SetRemoteStationManager ("ns3::CaraWifiManager");
+  dataset = experiment.Run (wifi, wifiPhy, wifiMac, wifiChannel);
+  gnuplot.AddDataset (dataset);
 
   // NS_LOG_DEBUG ("rraa");
   // experiment = Experiment ("rraa");
@@ -295,11 +295,11 @@ int main (int argc, char *argv[])
   dataset = experiment.Run (wifi, wifiPhy, wifiMac, wifiChannel);
   gnuplot.AddDataset (dataset);
 
-  // NS_LOG_UNCOND ("ideal");
-  // experiment = Experiment ("ideal");
-  // wifi.SetRemoteStationManager ("ns3::IdealWifiManager");
-  // dataset = experiment.Run (wifi, wifiPhy, wifiMac, wifiChannel);
-  // gnuplot.AddDataset (dataset);
+  NS_LOG_UNCOND ("ideal");
+  experiment = Experiment ("ideal");
+  wifi.SetRemoteStationManager ("ns3::IdealWifiManager");
+  dataset = experiment.Run (wifi, wifiPhy, wifiMac, wifiChannel);
+  gnuplot.AddDataset (dataset);
 
   gnuplot.GenerateOutput (std::cout);
 
