@@ -80,8 +80,8 @@ Experiment::AdvancePosition (Ptr<Node> node)
   Vector pos = GetPosition (node);
   double mbs = ((m_bytesTotal * 8.0) / 1000000);
   m_bytesTotal = 0;
-  m_output.Add (pos.x, mbs);
-  pos.x += 1.0;
+  m_output.Add (Simulator::Now().GetSeconds(), mbs);
+  pos.x += 0.5;
   if (pos.x >= 210.0) 
     {
       return;
@@ -168,6 +168,7 @@ Experiment::Run (const WifiHelper &wifi, const YansWifiPhyHelper &wifiPhy,
   //Simulator::Schedule (Seconds (1.5), &Experiment::ChangeSpeed, this, onoff);
   Ptr<Socket> recvSink = SetupPacketReceive (c.Get (1));
 
+  Simulator::Stop (Seconds (300.0));
   Simulator::Run ();
 
   Simulator::Destroy ();
@@ -257,7 +258,7 @@ int main (int argc, char *argv[])
 */
 
   gnuplot = Gnuplot ("rate-control.png");
-  wifi.SetStandard (WIFI_PHY_STANDARD_80211b);
+  wifi.SetStandard (WIFI_PHY_STANDARD_holland);
 
   // NS_LOG_DEBUG ("arf");
   // experiment = Experiment ("arf");
