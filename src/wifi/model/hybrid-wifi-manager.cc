@@ -236,7 +236,7 @@ HybridWifiManager::TryDoProbe()
 
     if (newItemInserted)
     {
-      doesJump = /*totalPackets > 10000 && */DoesSuccessRatioJump();
+      doesJump = totalPackets > 10000/* && DoesSuccessRatioJump()*/;
     }
 
     // condition to do probe
@@ -297,7 +297,7 @@ HybridWifiManager::DoReportDataFailed (WifiRemoteStation *st)
   failedPacketsCount++;
 
   TryDoProbe();
-  //totalPackets++;
+  totalPackets++;
 
   NS_LOG_FUNCTION (this << st);
   HybridWifiRemoteStation *station = (HybridWifiRemoteStation *) st;
