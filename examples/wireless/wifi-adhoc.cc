@@ -260,11 +260,11 @@ int main (int argc, char *argv[])
   gnuplot = Gnuplot ("rate-control.png");
   wifi.SetStandard (WIFI_PHY_STANDARD_holland);
 
-  // NS_LOG_DEBUG ("arf");
-  // experiment = Experiment ("arf");
-  // wifi.SetRemoteStationManager ("ns3::ArfWifiManager");
-  // dataset = experiment.Run (wifi, wifiPhy, wifiMac, wifiChannel);
-  // gnuplot.AddDataset (dataset);
+  NS_LOG_DEBUG ("arf");
+  experiment = Experiment ("arf");
+  wifi.SetRemoteStationManager ("ns3::ArfWifiManager");
+  dataset = experiment.Run (wifi, wifiPhy, wifiMac, wifiChannel);
+  gnuplot.AddDataset (dataset);
 
   NS_LOG_UNCOND ("aarf");
   experiment = Experiment ("aarf");
@@ -272,11 +272,11 @@ int main (int argc, char *argv[])
   dataset = experiment.Run (wifi, wifiPhy, wifiMac, wifiChannel);
   gnuplot.AddDataset (dataset);
 
-  // NS_LOG_DEBUG ("aarf-cd");
-  // experiment = Experiment ("aarf-cd");
-  // wifi.SetRemoteStationManager ("ns3::AarfcdWifiManager");
-  // dataset = experiment.Run (wifi, wifiPhy, wifiMac, wifiChannel);
-  // gnuplot.AddDataset (dataset);
+  NS_LOG_DEBUG ("aarf-cd");
+  experiment = Experiment ("aarf-cd");
+  wifi.SetRemoteStationManager ("ns3::AarfcdWifiManager");
+  dataset = experiment.Run (wifi, wifiPhy, wifiMac, wifiChannel);
+  gnuplot.AddDataset (dataset);
 
   NS_LOG_UNCOND ("cara");
   experiment = Experiment ("cara");
@@ -284,11 +284,11 @@ int main (int argc, char *argv[])
   dataset = experiment.Run (wifi, wifiPhy, wifiMac, wifiChannel);
   gnuplot.AddDataset (dataset);
 
-  // NS_LOG_DEBUG ("rraa");
-  // experiment = Experiment ("rraa");
-  // wifi.SetRemoteStationManager ("ns3::RraaWifiManager");
-  // dataset = experiment.Run (wifi, wifiPhy, wifiMac, wifiChannel);
-  // gnuplot.AddDataset (dataset);
+  NS_LOG_DEBUG ("rraa");
+  experiment = Experiment ("rraa");
+  wifi.SetRemoteStationManager ("ns3::RraaWifiManager");
+  dataset = experiment.Run (wifi, wifiPhy, wifiMac, wifiChannel);
+  gnuplot.AddDataset (dataset);
 
   NS_LOG_UNCOND ("hybrid");
   experiment = Experiment ("hybrid");

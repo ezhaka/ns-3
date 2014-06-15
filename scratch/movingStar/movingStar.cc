@@ -216,12 +216,13 @@ Experiment::Run (const WifiHelper &wifi, const YansWifiPhyHelper &wifiPhy,
 
   MobilityHelper mobility;
   Ptr<ListPositionAllocator> positionAlloc = CreateObject<ListPositionAllocator> ();
+  double distance = 50.0;
   positionAlloc->Add (Vector (0.0, 0.0, 0.0));
-  positionAlloc->Add (Vector (5.0, 0.0, 0.0));
-  positionAlloc->Add (Vector (5.0 * cos(PI / (nodesCount - 1)), 5.0 * sin(PI / (nodesCount - 1)), 0.0));
-  positionAlloc->Add (Vector (5.0 * cos(2.0 * PI / (nodesCount - 1)), 5.0 * sin(2.0 * PI / (nodesCount - 1)), 0.0));
-  positionAlloc->Add (Vector (5.0 * cos(3.0 * PI / (nodesCount - 1)), 5.0 * sin(3.0 * PI / (nodesCount - 1)), 0.0));
-  positionAlloc->Add (Vector (5.0 * cos(4.0 * PI / (nodesCount - 1)), 5.0 * sin(4.0 * PI / (nodesCount - 1)), 0.0));
+  positionAlloc->Add (Vector (distance, 0.0, 0.0));
+  positionAlloc->Add (Vector (distance * cos(PI / (nodesCount - 1)), distance * sin(PI / (nodesCount - 1)), 0.0));
+  positionAlloc->Add (Vector (distance * cos(2.0 * PI / (nodesCount - 1)), distance * sin(2.0 * PI / (nodesCount - 1)), 0.0));
+  positionAlloc->Add (Vector (distance * cos(3.0 * PI / (nodesCount - 1)), distance * sin(3.0 * PI / (nodesCount - 1)), 0.0));
+  positionAlloc->Add (Vector (distance * cos(4.0 * PI / (nodesCount - 1)), distance * sin(4.0 * PI / (nodesCount - 1)), 0.0));
   mobility.SetPositionAllocator (positionAlloc);
   mobility.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
 
@@ -268,25 +269,43 @@ int main (int argc, char *argv[])
 
   Gnuplot2dDataset dataset;
 
-  NS_LOG_DEBUG ("aarf");
+  // NS_LOG_DEBUG ("arf");
+  // Experiment experiment = Experiment ("arf");
+  // wifi.SetRemoteStationManager ("ns3::ArfWifiManager");
+  // dataset = experiment.Run (wifi, wifiPhy, wifiMac, wifiChannel);
+  // gnuplot.AddDataset (dataset);
+
+  NS_LOG_UNCOND ("aarf");
   Experiment experiment = Experiment ("aarf");
   wifi.SetRemoteStationManager ("ns3::AarfWifiManager");
   dataset = experiment.Run (wifi, wifiPhy, wifiMac, wifiChannel);
   gnuplot.AddDataset (dataset);
 
-  NS_LOG_DEBUG ("cara");
+  // NS_LOG_DEBUG ("aarf-cd");
+  // experiment = Experiment ("aarf-cd");
+  // wifi.SetRemoteStationManager ("ns3::AarfcdWifiManager");
+  // dataset = experiment.Run (wifi, wifiPhy, wifiMac, wifiChannel);
+  // gnuplot.AddDataset (dataset);
+
+  NS_LOG_UNCOND ("cara");
   experiment = Experiment ("cara");
   wifi.SetRemoteStationManager ("ns3::CaraWifiManager");
   dataset = experiment.Run (wifi, wifiPhy, wifiMac, wifiChannel);
   gnuplot.AddDataset (dataset);
 
-  NS_LOG_DEBUG ("hybrid");
+  // NS_LOG_DEBUG ("rraa");
+  // experiment = Experiment ("rraa");
+  // wifi.SetRemoteStationManager ("ns3::RraaWifiManager");
+  // dataset = experiment.Run (wifi, wifiPhy, wifiMac, wifiChannel);
+  // gnuplot.AddDataset (dataset);
+
+  NS_LOG_UNCOND ("hybrid");
   experiment = Experiment ("hybrid");
   wifi.SetRemoteStationManager ("ns3::HybridWifiManager");
   dataset = experiment.Run (wifi, wifiPhy, wifiMac, wifiChannel);
   gnuplot.AddDataset (dataset);
 
-  NS_LOG_DEBUG ("ideal");
+  NS_LOG_UNCOND ("ideal");
   experiment = Experiment ("ideal");
   wifi.SetRemoteStationManager ("ns3::IdealWifiManager");
   dataset = experiment.Run (wifi, wifiPhy, wifiMac, wifiChannel);
