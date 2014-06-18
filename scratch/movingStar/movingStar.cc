@@ -47,7 +47,6 @@ private:
   void SetPosition (Ptr<Node> node, Vector position);
   Vector GetPosition (Ptr<Node> node);
   void AdvancePosition (Ptr<Node> node);
-  void AdvancePosition2 (Ptr<Node> node);
   Ptr<Socket> SetupPacketReceive (Ptr<Node> node);
   void ChangeSpeed(OnOffHelper onOffHelper);
 
@@ -62,27 +61,11 @@ private:
   std::string AddressToString(Address address);
   Gnuplot2dDataset dataset;
   std::map<Address, uint32_t> mbytesTotal;
-
-  int flowsCount;
-
-  void IncFlowsCount();
-  void DecFlowsCount();
 };
-
-void Experiment::DecFlowsCount()
-{
-  flowsCount--;
-}
-
-void Experiment::IncFlowsCount()
-{
-  flowsCount++;
-}
 
 Experiment::Experiment (std::string name) : dataset(name)
 {
   dataset.SetStyle (Gnuplot2dDataset::LINES);
-  flowsCount = 0;
 }
 
 void
@@ -119,23 +102,10 @@ Experiment::AdvancePosition (Ptr<Node> node)
     iter->second = 0;
   }
 
-  dataset.Add(Simulator::Now().GetSeconds(), mbs / flowsCount);
+  dataset.Add(Simulator::Now().GetSeconds(), mbs / mbytesTotal.size());
 
   NS_LOG_UNCOND(Simulator::Now().GetSeconds());
   Simulator::Schedule (Seconds (1.0), &Experiment::AdvancePosition, this, node);
-}
-
-void 
-Experiment::AdvancePosition2 (Ptr<Node> node) 
-{
-  Vector pos = GetPosition (node);
-  pos.x += 1;
-  if (pos.x >= 210.0) 
-    {
-      return;
-    }
-  SetPosition (node, pos);
-  Simulator::Schedule (Seconds (1.0), &Experiment::AdvancePosition2, this, node);
 }
 
 void
@@ -189,9 +159,6 @@ Experiment::SetupApp(
   apps.Start (start);
   apps.Stop (stop);
   
-  Simulator::Schedule (start, &Experiment::IncFlowsCount, this);
-  Simulator::Schedule (stop, &Experiment::DecFlowsCount, this);
-
   if (setupPacketReceive)
   {
   }
@@ -202,7 +169,7 @@ Experiment::Run (const WifiHelper &wifi, const YansWifiPhyHelper &wifiPhy,
                  const NqosWifiMacHelper &wifiMac, const YansWifiChannelHelper &wifiChannel)
 {
   NodeContainer c;
-  int nodesCount = 6;
+  int nodesCount = 7;
   c.Create (nodesCount);
 
   PacketSocketHelper packetSocket;
@@ -216,29 +183,30 @@ Experiment::Run (const WifiHelper &wifi, const YansWifiPhyHelper &wifiPhy,
 
   MobilityHelper mobility;
   Ptr<ListPositionAllocator> positionAlloc = CreateObject<ListPositionAllocator> ();
-  double distance = 50.0;
   positionAlloc->Add (Vector (0.0, 0.0, 0.0));
-  positionAlloc->Add (Vector (distance, 0.0, 0.0));
-  positionAlloc->Add (Vector (distance * cos(PI / (nodesCount - 1)), distance * sin(PI / (nodesCount - 1)), 0.0));
-  positionAlloc->Add (Vector (distance * cos(2.0 * PI / (nodesCount - 1)), distance * sin(2.0 * PI / (nodesCount - 1)), 0.0));
-  positionAlloc->Add (Vector (distance * cos(3.0 * PI / (nodesCount - 1)), distance * sin(3.0 * PI / (nodesCount - 1)), 0.0));
-  positionAlloc->Add (Vector (distance * cos(4.0 * PI / (nodesCount - 1)), distance * sin(4.0 * PI / (nodesCount - 1)), 0.0));
+  positionAlloc->Add (Vector (5.0, 0.0, 0.0));
+  positionAlloc->Add (Vector (5.0 * cos(PI / (nodesCount - 1)), 5.0 * sin(PI / (nodesCount - 1)), 0.0));
+  positionAlloc->Add (Vector (5.0 * cos(2.0 * PI / (nodesCount - 1)), 5.0 * sin(2.0 * PI / (nodesCount - 1)), 0.0));
+  positionAlloc->Add (Vector (5.0 * cos(2.0 * PI / (nodesCount - 1)), 5.0 * sin(2.0 * PI / (nodesCount - 1)), 0.0));
+  positionAlloc->Add (Vector (5.0 * cos(3.0 * PI / (nodesCount - 1)), 5.0 * sin(3.0 * PI / (nodesCount - 1)), 0.0));
+  positionAlloc->Add (Vector (5.0 * cos(4.0 * PI / (nodesCount - 1)), 5.0 * sin(4.0 * PI / (nodesCount - 1)), 0.0));
+  positionAlloc->Add (Vector (5.0 * cos(5.0 * PI / (nodesCount - 1)), 5.0 * sin(5.0 * PI / (nodesCount - 1)), 0.0));
   mobility.SetPositionAllocator (positionAlloc);
   mobility.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
 
   mobility.Install (c);
 
   SetupApp(1, Seconds(0.5), Seconds(300.0), devices, c, true);
-  SetupApp(2, Seconds(25.0), Seconds(200.0), devices, c, false);
-  SetupApp(3, Seconds(50.0), Seconds(200.0), devices, c, false);
-  SetupApp(4, Seconds(125.0), Seconds(200.0), devices, c, false);
-  SetupApp(5, Seconds(150.0), Seconds(200.0), devices, c, false);
+  SetupApp(2, Seconds(50.0), Seconds(300.0), devices, c, false);
+  SetupApp(3, Seconds(100.0), Seconds(300.0), devices, c, false);
+  SetupApp(4, Seconds(150.0), Seconds(300.0), devices, c, false);
+  SetupApp(5, Seconds(200.0), Seconds(300.0), devices, c, false);
+  SetupApp(6, Seconds(250.0), Seconds(300.0), devices, c, false);
 
   Simulator::Schedule (Seconds (1.5), &Experiment::AdvancePosition, this, c.Get (0));
-  Simulator::Schedule (Seconds (200.0), &Experiment::AdvancePosition2, this, c.Get (1));
   Ptr<Socket> recvSink = SetupPacketReceive (c.Get (0));
 
-  Simulator::Stop (Seconds (300.0));
+  Simulator::Stop (Seconds (250.0));
   Simulator::Run ();
 
   Simulator::Destroy ();
@@ -268,24 +236,25 @@ int main (int argc, char *argv[])
   wifi.SetStandard (WIFI_PHY_STANDARD_holland);
 
   Gnuplot2dDataset dataset;
+  Experiment experiment = Experiment ("arf");
 
-  // NS_LOG_DEBUG ("arf");
-  // Experiment experiment = Experiment ("arf");
-  // wifi.SetRemoteStationManager ("ns3::ArfWifiManager");
-  // dataset = experiment.Run (wifi, wifiPhy, wifiMac, wifiChannel);
-  // gnuplot.AddDataset (dataset);
+  NS_LOG_DEBUG ("arf");
+  experiment = Experiment ("arf");
+  wifi.SetRemoteStationManager ("ns3::ArfWifiManager");
+  dataset = experiment.Run (wifi, wifiPhy, wifiMac, wifiChannel);
+  gnuplot.AddDataset (dataset);
 
   NS_LOG_UNCOND ("aarf");
-  Experiment experiment = Experiment ("aarf");
+  experiment = Experiment ("aarf");
   wifi.SetRemoteStationManager ("ns3::AarfWifiManager");
   dataset = experiment.Run (wifi, wifiPhy, wifiMac, wifiChannel);
   gnuplot.AddDataset (dataset);
 
-  // NS_LOG_DEBUG ("aarf-cd");
-  // experiment = Experiment ("aarf-cd");
-  // wifi.SetRemoteStationManager ("ns3::AarfcdWifiManager");
-  // dataset = experiment.Run (wifi, wifiPhy, wifiMac, wifiChannel);
-  // gnuplot.AddDataset (dataset);
+  NS_LOG_DEBUG ("aarf-cd");
+  experiment = Experiment ("aarf-cd");
+  wifi.SetRemoteStationManager ("ns3::AarfcdWifiManager");
+  dataset = experiment.Run (wifi, wifiPhy, wifiMac, wifiChannel);
+  gnuplot.AddDataset (dataset);
 
   NS_LOG_UNCOND ("cara");
   experiment = Experiment ("cara");
@@ -293,11 +262,11 @@ int main (int argc, char *argv[])
   dataset = experiment.Run (wifi, wifiPhy, wifiMac, wifiChannel);
   gnuplot.AddDataset (dataset);
 
-  // NS_LOG_DEBUG ("rraa");
-  // experiment = Experiment ("rraa");
-  // wifi.SetRemoteStationManager ("ns3::RraaWifiManager");
-  // dataset = experiment.Run (wifi, wifiPhy, wifiMac, wifiChannel);
-  // gnuplot.AddDataset (dataset);
+  NS_LOG_DEBUG ("rraa");
+  experiment = Experiment ("rraa");
+  wifi.SetRemoteStationManager ("ns3::RraaWifiManager");
+  dataset = experiment.Run (wifi, wifiPhy, wifiMac, wifiChannel);
+  gnuplot.AddDataset (dataset);
 
   NS_LOG_UNCOND ("hybrid");
   experiment = Experiment ("hybrid");
